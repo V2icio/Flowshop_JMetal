@@ -1,0 +1,1 @@
+jmetal.metaheuristics.singleObjective.geneticAlgorithm.ssGA

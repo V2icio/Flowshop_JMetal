@@ -1,0 +1,1 @@
+jmetal.encodings.solutionType.ArrayRealAndBinarySolutionType
