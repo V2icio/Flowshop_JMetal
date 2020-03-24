@@ -100,12 +100,12 @@ public class StandardStudy_FlowShopDD extends Experiment {
     exp.experimentName_ = "StandardStudy";  //usado ns tabelas do latex evitar "_"
     exp.algorithmNameList_ = new String[]{"NSGAII"}; //nome dos algoritmos a serem executados, vão ser criadas pastas e colunas das tabelas com estes nomes
                                 //"NSGAII", "SPEA2", "MOCell", "SMPSO", "GDE3"};
-    exp.problemList_ = new String[]{"DD_Ta010.txt", "DD_Ta011.txt", "DD_Ta012.txt",
-                                    "DD_Ta013.txt",  "DD_Ta015.txt", 
-                                    "DD_Ta016.txt", "DD_Ta017.txt", "DD_Ta018.txt",
-                                    "DD_Ta019.txt"};  //nomes das instâncias que serão executadas
+    exp.problemList_ = new String[]{"DD_Ta010.txt","DD_Ta020.txt", "DD_Ta030.txt", "DD_Ta040.txt",
+                                    "DD_Ta050.txt",  "DD_Ta060.txt",
+                                    "DD_Ta070.txt", "DD_Ta080.txt", "DD_Ta090.txt",
+                                    "DD_Ta100.txt","DD_Ta110.txt",};  //nomes das instâncias que serão executadas
                                     
-    exp.paretoFrontFile_ = new String[]{"","","","","","","","","",""}; //para cada instância um abre e fecha aspas indicando que não temos o arquivo correspondente a fronteira de Pareto
+    exp.paretoFrontFile_ = new String[]{"","","","","","","","","","",""}; //para cada instância um abre e fecha aspas indicando que não temos o arquivo correspondente a fronteira de Pareto
                                    
 
     exp.indicatorList_ = new String[]{"IGD"}; //será gerado os valores destes indicadores
@@ -123,6 +123,10 @@ public class StandardStudy_FlowShopDD extends Experiment {
     // Run the experiments
     int numberOfThreads ;
     exp.runExperiment(numberOfThreads = 4) ;
+
+
+
+
 
     // Generate latex tables
     exp.generateLatexTables() ;

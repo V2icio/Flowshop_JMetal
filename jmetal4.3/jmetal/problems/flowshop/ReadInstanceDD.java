@@ -36,7 +36,7 @@ public class ReadInstanceDD {
     private int[][] transposta;   // transposta da matrix para trabalhar com as máquinas nas linhas
     private int jobs_ = -1;          // number of facilities
     private int machines_ = -1;
-    private int objectives_ = 3;   // number of objectives 
+    private int objectives_ = 2;   // number of objectives
     private int[] dueDates;
     private String singleObjectiveFirstLine_ = "";
     private int num = -1;

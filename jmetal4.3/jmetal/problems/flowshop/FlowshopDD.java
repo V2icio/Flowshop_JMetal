@@ -169,7 +169,8 @@ public int getNumberOfJobs_() {
         //System.out.println(totalEarliness);
         solution.setObjective(0, makespan);
         solution.setObjective(1, flowtime);
-        solution.setObjective(2, totalTardiness);
+        //comentei aqui (Volmir 24/03/2020) //solution.setObjective(2, totalTardiness);
+
         //System.out.println("Num Objetivos vet= "+solution.getNumberOfObjectives());
         //solution.setObjective(3, totalEarliness);
     }
