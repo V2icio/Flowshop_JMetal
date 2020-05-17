@@ -22,9 +22,17 @@
 package jmetal.metaheuristics.nsgaII;
 
 import jmetal.core.*;
+import jmetal.operators.localSearch.LocalSearch;
+import jmetal.operators.localSearch.MutationLocalSearch;
+import jmetal.operators.selection.BestSolutionSelection;
+import jmetal.operators.selection.Selection;
 import jmetal.util.comparators.CrowdingComparator;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.*;
+import jmetal.util.comparators.DominanceComparator;
+
+import java.util.Comparator;
+import java.util.HashMap;
 
 /** 
  *  Implementation of NSGA-II.
@@ -68,6 +76,10 @@ public class NSGAIIwLS extends Algorithm {
 		Operator mutationOperator;
 		Operator crossoverOperator;
 		Operator selectionOperator;
+		LocalSearch localSearchOperator;
+
+		int localSearchFrequency; //Frequency of application of local search
+        int generations;
 
 		Distance distance = new Distance();
 
@@ -75,10 +87,13 @@ public class NSGAIIwLS extends Algorithm {
 		populationSize = ((Integer) getInputParameter("populationSize")).intValue();
 		maxEvaluations = ((Integer) getInputParameter("maxEvaluations")).intValue();
 		indicators = (QualityIndicator) getInputParameter("indicators");
+		localSearchFrequency = ((Integer) getInputParameter("localSearchFrequency")).intValue();
+
 
 		//Initialize the variables
 		population = new SolutionSet(populationSize);
 		evaluations = 0;
+		generations = 0;
 
 		requiredEvaluations = 0;
 
@@ -86,6 +101,9 @@ public class NSGAIIwLS extends Algorithm {
 		mutationOperator = operators_.get("mutation");
 		crossoverOperator = operators_.get("crossover");
 		selectionOperator = operators_.get("selection");
+		localSearchOperator = (LocalSearch) operators_.get("localSearch");
+
+
 
 		// Create the initial solutionSet
 		Solution newSolution;
@@ -99,10 +117,41 @@ public class NSGAIIwLS extends Algorithm {
 
 		// Generations 
 		while (evaluations < maxEvaluations) {
+            // Create the offSpring solutionSet
+            offspringPopulation = new SolutionSet(populationSize);
+            Solution[] parents = new Solution[2];
 
-			// Create the offSpring solutionSet      
-			offspringPopulation = new SolutionSet(populationSize);
-			Solution[] parents = new Solution[2];
+
+		    generations++;
+		    if(generations % localSearchFrequency == 0 && localSearchOperator != null){
+                Solution bestSolution = population.get(0);
+
+                double obj1[] = new double[2];
+                double obj2[] = new double[2];
+
+                obj1[0] = (double) bestSolution.getObjective(0);
+                obj2[0] = (double) bestSolution.getObjective(1);
+
+                bestSolution = (Solution) localSearchOperator.execute(bestSolution);
+
+
+                //AQui   localSearchOperator.getEvaluations();
+
+
+                problem_.evaluate(bestSolution);
+                problem_.evaluateConstraints(bestSolution);
+
+                obj1[1] = (double) bestSolution.getObjective(0);
+                obj2[1] = (double) bestSolution.getObjective(1);
+
+                double improvement1 = obj1[0] - obj1[1];
+                double improvement2 = obj2[0] - obj2[1];
+                System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+
+                population.replace(0, bestSolution);
+            }
+
+
 			for (int i = 0; i < (populationSize / 2); i++) {
 				if (evaluations < maxEvaluations) {
 					//obtain parents

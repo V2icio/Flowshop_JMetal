@@ -49,6 +49,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
   public double crossoverProbability_        ;
   public double mutationDistributionIndex_   ;
   public double crossoverDistributionIndex_  ;
+  public int localSearchFrequency_  ;
   
   /**
    * Constructor
@@ -74,6 +75,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     crossoverProbability_        = 0.9   ;
     mutationDistributionIndex_   = 20.0  ;
     crossoverDistributionIndex_  = 20.0  ;
+    localSearchFrequency_ = 30;
   } // NSGAII_Settings
 
   
@@ -95,7 +97,8 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     
     // Creating the algorithm. There are two choices: NSGAII and its steady-
     // state variant ssNSGAII
-    algorithm = new NSGAII(problem_) ;
+    //algorithm = new NSGAII(problem_) ;//Volmir comentou aqui
+      algorithm = new NSGAIIwLS(problem_) ;
     //algorithm = new ssNSGAII(problem_) ;
     
     // Algorithm parameters
@@ -111,12 +114,15 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     parameters = new HashMap() ;
     parameters.put("probability", mutationProbability_) ;
     parameters.put("distributionIndex", mutationDistributionIndex_) ;
-    mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);                        
+    mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
+
+
+    algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
 
     // Tentativa de colocar a busca local ja implementada XD
     parameters = new HashMap() ;
     parameters.put("problem",problem_);
-    parameters.put("improvementRounds",20);
+    parameters.put("improvementRounds",200);
     parameters.put("mutation",mutation);
     localSearch = new MutationLocalSearch(parameters);
 

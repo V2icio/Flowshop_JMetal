@@ -171,8 +171,6 @@ public class MutationLocalSearch extends LocalSearch {
       }                            
     }
     while (i < rounds);
-
-    System.out.println("MutationLocalSearch aplicada\n");
     return new Solution(solution);
   } // execute
   
