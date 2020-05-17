@@ -36,13 +36,13 @@ import jmetal.util.*;
  *     To be presented in: PPSN'08. Dortmund. September 2008.
  */
 
-public class NSGAII extends Algorithm {
+public class NSGAIIwLS extends Algorithm {
 
 	/**
 	 * Constructor
 	 * @param problem Problem to solve
 	 */
-	public NSGAII(Problem problem) {
+	public NSGAIIwLS(Problem problem) {
 		super (problem) ;
 	} // NSGAII
 

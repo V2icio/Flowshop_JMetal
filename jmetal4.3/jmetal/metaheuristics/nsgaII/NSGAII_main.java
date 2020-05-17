@@ -47,16 +47,16 @@ import jmetal.qualityIndicator.QualityIndicator;
 //imports incluídos por Sandra
 import jmetal.problems.flowshop.FlowshopDD;
 
-/** 
- * Class to configure and execute the NSGA-II algorithm.  
- *     
+/**
+ * Class to configure and execute the NSGA-II algorithm.
+ *
  * Besides the classic NSGA-II, a steady-state version (ssNSGAII) is also
- * included (See: J.J. Durillo, A.J. Nebro, F. Luna and E. Alba 
- *                  "On the Effect of the Steady-State Selection Scheme in 
+ * included (See: J.J. Durillo, A.J. Nebro, F. Luna and E. Alba
+ *                  "On the Effect of the Steady-State Selection Scheme in
  *                  Multi-Objective Genetic Algorithms"
- *                  5th International Conference, EMO 2009, pp: 183-197. 
+ *                  5th International Conference, EMO 2009, pp: 183-197.
  *                  April 2009)
- */ 
+ */
 
 public class NSGAII_main {
   public static Logger      logger_ ;      // Logger object
@@ -64,34 +64,34 @@ public class NSGAII_main {
 
   /**
    * @param args Command line arguments.
-   * @throws JMException 
-   * @throws IOException 
-   * @throws SecurityException 
+   * @throws JMException
+   * @throws IOException
+   * @throws SecurityException
    * Usage: three options
    *      - jmetal.metaheuristics.nsgaII.NSGAII_main
    *      - jmetal.metaheuristics.nsgaII.NSGAII_main problemName
    *      - jmetal.metaheuristics.nsgaII.NSGAII_main problemName paretoFrontFile
    */
-  public static void main(String [] args) throws 
-                                  JMException, 
-                                  SecurityException, 
-                                  IOException, 
+  public static void main(String [] args) throws
+                                  JMException,
+                                  SecurityException,
+                                  IOException,
                                   ClassNotFoundException {
     Problem   problem   ; // The problem to solve
     Algorithm algorithm ; // The algorithm to use
     Operator  crossover ; // Crossover operator
     Operator  mutation  ; // Mutation operator
     Operator  selection ; // Selection operator
-    
+
     HashMap  parameters ; // Operator parameters
-    
+
     QualityIndicator indicators ; // Object to get quality indicators
 
     // Logger object and file to store log messages
     logger_      = Configuration.logger_ ;
-    fileHandler_ = new FileHandler("NSGAII_main.log"); 
+    fileHandler_ = new FileHandler("NSGAII_main.log");
     logger_.addHandler(fileHandler_) ;
-        
+
     indicators = null ;
     //Sandra comentou daqui
 //    if (args.length == 1) {
@@ -113,11 +113,11 @@ public class NSGAII_main {
 //      //problem = new OKA2("Real") ;
 //    } // else
 //Sandra comentou até aqui
-    
+
     problem = new FlowshopDD("Permutation", //Sandra incluiu
         "/home/usuario/JavaProjects/Instancias_Due/DD_Ta010.txt");
     //"C:\\Users\\Carolina\\Documents\\Carol\\Códigos\\MOEAD_LinUCB\\instancias\\tai20_5.txt");
-    
+
     algorithm = new NSGAII(problem);
     //algorithm = new ssNSGAII(problem);
 
@@ -125,20 +125,20 @@ public class NSGAII_main {
     algorithm.setInputParameter("populationSize",100);
     algorithm.setInputParameter("maxEvaluations",25000);
 
-    // Mutation and Crossover for Real codification 
+    // Mutation and Crossover for Real codification
     parameters = new HashMap() ;
     parameters.put("probability", 0.9) ;
     parameters.put("distributionIndex", 20.0) ;
-    crossover = CrossoverFactory.getCrossoverOperator("TwoPointsCrossover", parameters);                   
+    crossover = CrossoverFactory.getCrossoverOperator("TwoPointsCrossover", parameters);
 
     parameters = new HashMap() ;
     parameters.put("probability", 1.0/problem.getNumberOfVariables()) ;
     parameters.put("distributionIndex", 20.0) ;
-    mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);                    
+    mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
 
-    // Selection Operator 
+    // Selection Operator
     parameters = null ;
-    selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;                           
+    selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;
 
     // Add the operators to the algorithm
     algorithm.addOperator("crossover",crossover);
@@ -147,29 +147,29 @@ public class NSGAII_main {
 
     // Add the indicator object to the algorithm
     algorithm.setInputParameter("indicators", indicators) ;
-    
+
     // Execute the Algorithm
     long initTime = System.currentTimeMillis();
     SolutionSet population = algorithm.execute();
     long estimatedTime = System.currentTimeMillis() - initTime;
-    
-    // Result messages 
+
+    // Result messages
     logger_.info("Total execution time: "+estimatedTime + "ms");
     logger_.info("Variables values have been writen to file VAR");
-    population.printVariablesToFile("VAR");    
+    population.printVariablesToFile("VAR");
     logger_.info("Objectives values have been writen to file FUN");
     population.printObjectivesToFile("FUN");
-  
+
     if (indicators != null) {
       logger_.info("Quality indicators") ;
       logger_.info("Hypervolume: " + indicators.getHypervolume(population)) ;
       logger_.info("GD         : " + indicators.getGD(population)) ;
       logger_.info("IGD        : " + indicators.getIGD(population)) ;
       logger_.info("Spread     : " + indicators.getSpread(population)) ;
-      logger_.info("Epsilon    : " + indicators.getEpsilon(population)) ;  
-     
+      logger_.info("Epsilon    : " + indicators.getEpsilon(population)) ;
+
       int evaluations = ((Integer)algorithm.getOutputParameter("evaluations")).intValue();
-      logger_.info("Speed      : " + evaluations + " evaluations") ;      
+      logger_.info("Speed      : " + evaluations + " evaluations") ;
     } // if
   } //main
 } // NSGAII_main

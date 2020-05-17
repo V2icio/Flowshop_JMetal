@@ -27,6 +27,8 @@ import java.util.HashMap;
 import jmetal.metaheuristics.nsgaII.*;
 import jmetal.operators.crossover.Crossover;
 import jmetal.operators.crossover.CrossoverFactory;
+import jmetal.operators.localSearch.LocalSearch;
+import jmetal.operators.localSearch.MutationLocalSearch;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.mutation.MutationFactory;
 import jmetal.operators.selection.Selection;
@@ -85,6 +87,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     Selection  selection ;
     Crossover  crossover ;
     Mutation   mutation  ;
+    LocalSearch localSearch;
 
     HashMap  parameters ; // Operator parameters
 
@@ -110,6 +113,14 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     parameters.put("distributionIndex", mutationDistributionIndex_) ;
     mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);                        
 
+    // Tentativa de colocar a busca local ja implementada XD
+    parameters = new HashMap() ;
+    parameters.put("problem",problem_);
+    parameters.put("improvementRounds",20);
+    parameters.put("mutation",mutation);
+    localSearch = new MutationLocalSearch(parameters);
+
+
     // Selection Operator 
     parameters = null ;
     selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;     
@@ -118,7 +129,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     algorithm.addOperator("crossover",crossover);
     algorithm.addOperator("mutation",mutation);
     algorithm.addOperator("selection",selection);
-    
+    algorithm.addOperator("localSearch",localSearch);
     
     /* Deleted since jMetal 4.2
    // Creating the indicator object
