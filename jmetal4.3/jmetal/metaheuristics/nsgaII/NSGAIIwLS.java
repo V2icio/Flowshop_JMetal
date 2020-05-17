@@ -134,9 +134,7 @@ public class NSGAIIwLS extends Algorithm {
 
                 bestSolution = (Solution) localSearchOperator.execute(bestSolution);
 
-
-                //AQui   localSearchOperator.getEvaluations();
-
+                evaluations += localSearchOperator.getEvaluations();
 
                 problem_.evaluate(bestSolution);
                 problem_.evaluateConstraints(bestSolution);
