@@ -80,7 +80,7 @@ public class SolutionSet implements Serializable {
    * Returns the ith solution in the set.
    * @param i Position of the solution to obtain.
    * @return The <code>Solution</code> at the position i.
-   * @throws IndexOutOfBoundsException.
+   * @throws IndexOutOfBoundsException
    */
   public Solution get(int i) {
     if (i >= solutionsList_.size()) {

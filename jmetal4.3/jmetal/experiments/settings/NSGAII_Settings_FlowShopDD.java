@@ -29,6 +29,7 @@ import jmetal.operators.crossover.Crossover;
 import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.localSearch.LocalSearch;
 import jmetal.operators.localSearch.MutationLocalSearch;
+import jmetal.operators.localSearch.TabuLocalSearch;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.mutation.MutationFactory;
 import jmetal.operators.selection.Selection;
@@ -43,99 +44,101 @@ import jmetal.util.JMException;
  * Settings class of algorithm NSGA-II (real encoding)
  */
 public class NSGAII_Settings_FlowShopDD extends Settings {
-  public int populationSize_                 ; 
-  public int maxEvaluations_                 ;
-  public double mutationProbability_         ;
-  public double crossoverProbability_        ;
-  public double mutationDistributionIndex_   ;
-  public double crossoverDistributionIndex_  ;
-  public int localSearchFrequency_  ;
-  
-  /**
-   * Constructor
-   * @throws JMException 
-   */
-  public NSGAII_Settings_FlowShopDD(String problem) throws JMException {
-    super(problem) ;
-    //alterado de real para permutation, inclusão do caminho
-    //Object [] problemParams = {"Real"};
-    Object [] problemParams = {"Permutation","C:\\Users\\Volmir\\Desktop\\Jmetal_4.3\\JavaProjects\\Instancias_Due\\"+ problem};
-    //        problem_ = new FlowshopDD("Permutation", "C:\\Users\\carol\\Documents\\Carol\\Submissões_Artigos\\Revistas\\ASOC2019\\MOEAD_LinUCB_FS_Carol_Sandra\\Instancias_Due\\"+problemComponents[0]);
+    public int populationSize_                 ;
+    public int maxEvaluations_                 ;
+    public double mutationProbability_         ;
+    public double crossoverProbability_        ;
+    public double mutationDistributionIndex_   ;
+    public double crossoverDistributionIndex_  ;
+    public int localSearchFrequency_  ;
 
-    try {
-	    problem_ = (new ProblemFactory()).getProblem("FlowshopDD", problemParams);
-    } catch (JMException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-    }  
-    // Default settings
-    populationSize_              = 100   ; 
-    maxEvaluations_              = 25000 ;
-    mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
-    crossoverProbability_        = 0.9   ;
-    mutationDistributionIndex_   = 20.0  ;
-    crossoverDistributionIndex_  = 20.0  ;
-    localSearchFrequency_ = 30;
-  } // NSGAII_Settings
+    /**
+     * Constructor
+     * @throws JMException
+     */
+    public NSGAII_Settings_FlowShopDD(String problem) throws JMException {
+        super(problem) ;
+        //alterado de real para permutation, inclusão do caminho
+        //Object [] problemParams = {"Real"};
+        Object [] problemParams = {"Permutation","C:\\Users\\Volmir\\Desktop\\Jmetal_4.3\\JavaProjects\\Instancias_Due\\"+ problem};
+        //        problem_ = new FlowshopDD("Permutation", "C:\\Users\\carol\\Documents\\Carol\\Submissões_Artigos\\Revistas\\ASOC2019\\MOEAD_LinUCB_FS_Carol_Sandra\\Instancias_Due\\"+problemComponents[0]);
 
-  
-  /**
-   * Configure NSGAII with user-defined parameter settings
-   * @return A NSGAII algorithm object
-   * @throws jmetal.util.JMException
-   */
-  public Algorithm configure() throws JMException {
-    Algorithm algorithm ;
-    Selection  selection ;
-    Crossover  crossover ;
-    Mutation   mutation  ;
-    LocalSearch localSearch;
-
-    HashMap  parameters ; // Operator parameters
-
-    QualityIndicator indicators ;
-    
-    // Creating the algorithm. There are two choices: NSGAII and its steady-
-    // state variant ssNSGAII
-    //algorithm = new NSGAII(problem_) ;//Volmir comentou aqui
-      algorithm = new NSGAIIwLS(problem_) ;
-    //algorithm = new ssNSGAII(problem_) ;
-    
-    // Algorithm parameters
-    algorithm.setInputParameter("populationSize",populationSize_);
-    algorithm.setInputParameter("maxEvaluations",maxEvaluations_);
-
-    // Mutation and Crossover for Real codification
-    parameters = new HashMap() ;
-    parameters.put("probability", crossoverProbability_) ;
-    parameters.put("distributionIndex", crossoverDistributionIndex_) ;
-    crossover = CrossoverFactory.getCrossoverOperator("TwoPointsCrossover", parameters);                   
-
-    parameters = new HashMap() ;
-    parameters.put("probability", mutationProbability_) ;
-    parameters.put("distributionIndex", mutationDistributionIndex_) ;
-    mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
+        try {
+            problem_ = (new ProblemFactory()).getProblem("FlowshopDD", problemParams);
+        } catch (JMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // Default settings
+        populationSize_              = 100   ;
+        maxEvaluations_              = 25000 ;
+        mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
+        crossoverProbability_        = 0.9   ;
+        mutationDistributionIndex_   = 20.0  ;
+        crossoverDistributionIndex_  = 20.0  ;
+        localSearchFrequency_ = 30;
+    } // NSGAII_Settings
 
 
-    algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
+    /**
+     * Configure NSGAII with user-defined parameter settings
+     * @return A NSGAII algorithm object
+     * @throws jmetal.util.JMException
+     */
+    public Algorithm configure() throws JMException {
+        Algorithm algorithm ;
+        Selection  selection ;
+        Crossover  crossover ;
+        Mutation   mutation  ;
+        LocalSearch localSearch;
 
-    // Tentativa de colocar a busca local ja implementada XD
-    parameters = new HashMap() ;
-    parameters.put("problem",problem_);
-    parameters.put("improvementRounds",200);
-    parameters.put("mutation",mutation);
-    localSearch = new MutationLocalSearch(parameters);
+        HashMap  parameters ; // Operator parameters
+
+        QualityIndicator indicators ;
+
+        // Creating the algorithm. There are two choices: NSGAII and its steady-
+        // state variant ssNSGAII
+        //algorithm = new NSGAII(problem_) ;//Volmir comentou aqui
+        algorithm = new NSGAIIwLS(problem_) ;
+        //algorithm = new ssNSGAII(problem_) ;
+
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize",populationSize_);
+        algorithm.setInputParameter("maxEvaluations",maxEvaluations_);
+
+        // Mutation and Crossover for Real codification
+        parameters = new HashMap() ;
+        parameters.put("probability", crossoverProbability_) ;
+        parameters.put("distributionIndex", crossoverDistributionIndex_) ;
+        crossover = CrossoverFactory.getCrossoverOperator("TwoPointsCrossover", parameters);
+
+        parameters = new HashMap() ;
+        parameters.put("probability", mutationProbability_) ;
+        parameters.put("distributionIndex", mutationDistributionIndex_) ;
+        mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
 
 
-    // Selection Operator 
-    parameters = null ;
-    selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;     
+        algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
 
-    // Add the operators to the algorithm
-    algorithm.addOperator("crossover",crossover);
-    algorithm.addOperator("mutation",mutation);
-    algorithm.addOperator("selection",selection);
-    algorithm.addOperator("localSearch",localSearch);
+        // Tentativa de colocar a busca local ja implementada XD
+        parameters = new HashMap() ;
+        parameters.put("problem",problem_);
+        parameters.put("improvementRounds",200);
+        parameters.put("numberOfNeighbors",20);
+        parameters.put("tabuLenghtTime",10);
+        parameters.put("mutation",mutation);
+        //localSearch = new MutationLocalSearch(parameters);
+        localSearch = new TabuLocalSearch(parameters);
+
+        // Selection Operator
+        parameters = null ;
+        selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;
+
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover",crossover);
+        algorithm.addOperator("mutation",mutation);
+        algorithm.addOperator("selection",selection);
+        algorithm.addOperator("localSearch",localSearch);
     
     /* Deleted since jMetal 4.2
    // Creating the indicator object
@@ -144,6 +147,6 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
       algorithm.setInputParameter("indicators", indicators) ;  
    } // if
    */
-    return algorithm ;
-  } // configure
+        return algorithm ;
+    } // configure
 } // NSGAII_Settings

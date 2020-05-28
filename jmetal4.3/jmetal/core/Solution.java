@@ -105,7 +105,20 @@ public class Solution implements Serializable {
    * Stores the distance between this solution and a <code>SolutionSet</code>.
    * Used in AbySS.
    */
-  private double distanceToSolutionSet_ ;       
+  private double distanceToSolutionSet_ ;
+
+
+
+  //Movement used to create this neighbor. Used in TabuSearch for Permutation Problems.
+  private int[] swapMovement;
+
+  public int[] getSwapMovement() {
+    return swapMovement;
+  }
+
+  public void setSwapMovement(int[] swapMovement) {
+    this.swapMovement = swapMovement;
+  }
 
   /**
    * Constructor.
