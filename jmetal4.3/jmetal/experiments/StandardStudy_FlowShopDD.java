@@ -29,13 +29,8 @@ import java.util.Properties;
 
 import jmetal.core.Algorithm;
 import jmetal.core.Problem;
-import jmetal.experiments.settings.GDE3_Settings;
-import jmetal.experiments.settings.MOCell_Settings;
-import jmetal.experiments.settings.NSGAII_Settings;
-import jmetal.experiments.settings.SPEA2_Settings;
-import jmetal.experiments.settings.SMPSO_Settings;
+import jmetal.experiments.settings.*;
 //incluído por Sandra
-import jmetal.experiments.settings.NSGAII_Settings_FlowShopDD;
 import jmetal.experiments.util.RBoxplot;
 import jmetal.experiments.util.RWilcoxon;
 import jmetal.util.JMException;
@@ -51,11 +46,11 @@ public class StandardStudy_FlowShopDD extends Experiment {
    * Configures the algorithms in each independent run
    * @param problemName The problem to solve
    * @param problemIndex
-   * @throws ClassNotFoundException 
+   * @throws ClassNotFoundException
    */
-  public void algorithmSettings(String problemName, 
-  		                          int problemIndex, 
-  		                          Algorithm[] algorithm) throws ClassNotFoundException {
+  public void algorithmSettings(String problemName,
+                                int problemIndex,
+                                Algorithm[] algorithm) throws ClassNotFoundException {
     try {
       int numberOfAlgorithms = algorithmNameList_.length;
 
@@ -68,17 +63,30 @@ public class StandardStudy_FlowShopDD extends Experiment {
       if (!paretoFrontFile_[problemIndex].equals("")) {
         for (int i = 0; i < numberOfAlgorithms; i++)
           parameters[i].put("paretoFrontFile_", paretoFrontFile_[problemIndex]);
-        } // if
+      } // if
 
-        //algorithm[0] = new NSGAII_Settings(problemName).configure(parameters[0]);
-        //algorithm[1] = new SPEA2_Settings(problemName).configure(parameters[1]);
-        //algorithm[2] = new MOCell_Settings(problemName).configure(parameters[2]);
-        //algorithm[3] = new SMPSO_Settings(problemName).configure(parameters[3]);
-        //algorithm[4] = new GDE3_Settings(problemName).configure(parameters[4]);
-        //incluído
-        algorithm[0] = new NSGAII_Settings_FlowShopDD(problemName).configure(parameters[0]);
-    
-      } catch (IllegalArgumentException ex) {
+      //parameters[0].put("prohibitionRule", 7);
+      //parameters[0].put("prohibitionRule", 2);
+
+      //algorithm[0] = new NSGAII_Settings(problemName).configure(parameters[0]);
+      //algorithm[1] = new SPEA2_Settings(problemName).configure(parameters[1]);
+      //algorithm[2] = new MOCell_Settings(problemName).configure(parameters[2]);
+      //algorithm[3] = new SMPSO_Settings(problemName).configure(parameters[3]);
+      //algorithm[4] = new GDE3_Settings(problemName).configure(parameters[4]);
+      //incluído
+
+      //Gambiarra que eu fiz pq n consegui pensar em nada melhor
+      Settings aux = new NSGAII_Settings_FlowShopDD_with_Local_Search(problemName);
+      ((NSGAII_Settings_FlowShopDD_with_Local_Search) aux).prohibitionRule = 7;
+      algorithm[0] = aux.configure(parameters[0]);
+
+      /*
+      aux = new NSGAII_Settings_FlowShopDD_with_Local_Search(problemName);
+      ((NSGAII_Settings_FlowShopDD_with_Local_Search) aux).prohibitionRule = 2;
+      algorithm[1] = aux.configure(parameters[1]);
+*/
+
+    } catch (IllegalArgumentException ex) {
       Logger.getLogger(StandardStudy.class.getName()).log(Level.SEVERE, null, ex);
     } catch (IllegalAccessException ex) {
       Logger.getLogger(StandardStudy.class.getName()).log(Level.SEVERE, null, ex);
@@ -98,18 +106,18 @@ public class StandardStudy_FlowShopDD extends Experiment {
     StandardStudy_FlowShopDD exp = new StandardStudy_FlowShopDD();
 
     exp.experimentName_ = "StandardStudy";  //usado ns tabelas do latex evitar "_"
-    exp.algorithmNameList_ = new String[]{"NSGAII"}; //nome dos algoritmos a serem executados, vão ser criadas pastas e colunas das tabelas com estes nomes
-                                //"NSGAII", "SPEA2", "MOCell", "SMPSO", "GDE3"};
+    exp.algorithmNameList_ = new String[]{"NSGAIIRul7"}; //nome dos algoritmos a serem executados, vão ser criadas pastas e colunas das tabelas com estes nomes
+    //"NSGAII", "SPEA2", "MOCell", "SMPSO", "GDE3"};
     exp.problemList_ = new String[]{"DD_Ta010.txt","DD_Ta020.txt", "DD_Ta030.txt", "DD_Ta040.txt",
-                                    "DD_Ta050.txt",  "DD_Ta060.txt",
-                                    "DD_Ta070.txt", "DD_Ta080.txt", "DD_Ta090.txt",
-                                    "DD_Ta100.txt","DD_Ta110.txt",};  //nomes das instâncias que serão executadas
-                                    
-    exp.paretoFrontFile_ = new String[]{"","","","","","","","","","",""}; //para cada instância um abre e fecha aspas indicando que não temos o arquivo correspondente a fronteira de Pareto
-                                   
+            "DD_Ta050.txt",  "DD_Ta060.txt",
+            "DD_Ta070.txt", "DD_Ta080.txt", "DD_Ta090.txt",
+            "DD_Ta100.txt","DD_Ta110.txt",};  //nomes das instâncias que serão executadas
 
-    exp.indicatorList_ = new String[]{"IGD"}; //será gerado os valores destes indicadores
-                                    //"HV", "SPREAD", "EPSILON"};
+    exp.paretoFrontFile_ = new String[]{"","","","","","","","","","",""}; //para cada instância um abre e fecha aspas indicando que não temos o arquivo correspondente a fronteira de Pareto
+
+
+    exp.indicatorList_ = new String[]{"IGD","HV", "SPREAD", "EPSILON"}; //será gerado os valores destes indicadores
+    //"HV", "SPREAD", "EPSILON"};
 
     int numberOfAlgorithms = exp.algorithmNameList_.length;
 
@@ -122,7 +130,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
 
     // Run the experiments
     int numberOfThreads ;
-    exp.runExperiment(numberOfThreads = 4) ;
+    exp.runExperiment(numberOfThreads = 1) ;
 
 
 
@@ -143,7 +151,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
     columns = 2 ;
     prefix = new String("ZDT");
     problems = new String[]{"ZDT1", "ZDT2","ZDT3", "ZDT4","ZDT6"} ;
-    
+
     exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch = false, exp) ;
     exp.generateRWilcoxonScripts(problems, prefix, exp) ;
 
@@ -152,7 +160,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
     columns = 3 ;
     prefix = new String("DTLZ");
     problems = new String[]{"DTLZ1","DTLZ2","DTLZ3","DTLZ4","DTLZ5",
-                                    "DTLZ6","DTLZ7"} ;
+            "DTLZ6","DTLZ7"} ;
 
     exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch=false, exp) ;
     exp.generateRWilcoxonScripts(problems, prefix, exp) ;
@@ -162,7 +170,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
     columns = 3 ;
     prefix = new String("WFG");
     problems = new String[]{"WFG1","WFG2","WFG3","WFG4","WFG5","WFG6",
-                            "WFG7","WFG8","WFG9"} ;
+            "WFG7","WFG8","WFG9"} ;
 
     exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch=false, exp) ;
     exp.generateRWilcoxonScripts(problems, prefix, exp) ;

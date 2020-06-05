@@ -64,9 +64,10 @@ public class TabuLocalSearch extends LocalSearch {
      */
     private int evaluations_;
 
-    private int[] tabuList_;
+    private int[][] tabuList_;
     private int numberOfNeighbors;
     private int tabuLenghtTime;
+    private int prohibitionRule;
 
     public TabuLocalSearch(HashMap<String, Object> parameters) {
         super(parameters);
@@ -78,6 +79,8 @@ public class TabuLocalSearch extends LocalSearch {
             numberOfNeighbors = (Integer) parameters.get("numberOfNeighbors");
         if (parameters.get("tabuLenghtTime") != null)
             tabuLenghtTime = (Integer) parameters.get("tabuLenghtTime");
+        if (parameters.get("prohibitionRule") != null)
+            prohibitionRule = (Integer) parameters.get("prohibitionRule");
 
         evaluations_ = 0;
         archive_ = null;
@@ -137,7 +140,7 @@ public class TabuLocalSearch extends LocalSearch {
 
         int permutationLength;
         permutationLength = ((Permutation) solution.getDecisionVariables()[0]).getLength();
-        tabuList_ = new int[permutationLength];
+        tabuList_ = new int[permutationLength][permutationLength];
 
         int[][] moves = generateNeighborsSwaps(permutationLength);
 
@@ -179,22 +182,46 @@ public class TabuLocalSearch extends LocalSearch {
         int best = dominanceComparator_.compare(currentSolution, solution);
 
         int[] swaps = currentSolution.getSwapMovement();
-        //Satisfazer um critério de aspiração. Atualizar o Tabu Time dos moves.
-        if (best != 1){
-            tabuList_[swaps[0]] = currentRound + tabuLenghtTime;
-            tabuList_[swaps[1]] = currentRound + tabuLenghtTime;
-            return 2;
+
+        int[] currentSolutionPermutation = ((Permutation)currentSolution.getDecisionVariables()[0]).vector_;
+
+        if(prohibitionRule == 2){
+            if (best == -1){
+                tabuList_[swaps[0]][currentSolutionPermutation[swaps[1]]] = currentRound + tabuLenghtTime;
+                tabuList_[swaps[1]][currentSolutionPermutation[swaps[0]]] = currentRound + tabuLenghtTime;
+                return 2;
+            }
+            if(tabuList_[swaps[0]][currentSolutionPermutation[swaps[1]]] > currentRound ||
+                    tabuList_[swaps[1]][currentSolutionPermutation[swaps[0]]] > currentRound)
+                return 1;
+            else {
+                //Não é tabu. Tornar o movimento Tabu
+                tabuList_[swaps[0]][currentSolutionPermutation[swaps[1]]] = currentRound + tabuLenghtTime;
+                tabuList_[swaps[1]][currentSolutionPermutation[swaps[0]]] = currentRound + tabuLenghtTime;
+                return 0;
+            }
+
+
+        } else if(prohibitionRule == 7){
+            //Satisfazer um critério de aspiração. Atualizar o Tabu Time dos moves.
+            if (best == -1){
+                tabuList_[swaps[0]][0] = currentRound + tabuLenghtTime;
+                tabuList_[swaps[1]][0] = currentRound + tabuLenghtTime;
+                return 2;
+            }
+            //Se for tabu
+            if(tabuList_[swaps[0]][0] > currentRound || tabuList_[swaps[1]][0] > currentRound)
+                return 1;
+            else {
+                //Não é tabu. Tornar o movimento Tabu
+                tabuList_[swaps[0]][0] = currentRound + tabuLenghtTime;
+                tabuList_[swaps[1]][0] = currentRound + tabuLenghtTime;
+                return 0;
+            }
         }
 
-        //Se for tabu
-        if(tabuList_[swaps[0]] > currentRound || tabuList_[swaps[1]] > currentRound)
-            return 1;
-        else {
-            //Não é tabu. Tornar o movimento Tabu
-            tabuList_[swaps[0]] = currentRound + tabuLenghtTime;
-            tabuList_[swaps[1]] = currentRound + tabuLenghtTime;
-            return 0;
-        }
+        return 1;
+
     }
 
     public Object execute(Object object) throws JMException {
@@ -208,12 +235,15 @@ public class TabuLocalSearch extends LocalSearch {
         if (rounds <= 0)
             return new Solution(solution);
 
-        for(int i=0; i < rounds; i++){
-            int flagFindNonTabu = 0;
-            Solution mutatedSolution = new Solution(solution);
-            //mutationOperator_.execute(mutatedSolution); //Comentei aqui, trabalhar em cima disso
 
-            SolutionSet neighbors = generateXNeighbors(object);
+
+        for(int i=0; i < rounds; i++){
+            Solution mutatedSolution = new Solution(solution);
+
+            int flagFindNonTabu = 0;
+
+            //SolutionSet neighbors = generateXNeighbors(object);
+            SolutionSet neighbors = generateXNeighbors(mutatedSolution);
 
             Ranking ranking = new Ranking(neighbors);
 
@@ -223,7 +253,7 @@ public class TabuLocalSearch extends LocalSearch {
 
                 for (int k = 0; k < front.size(); k++) {
                     Solution currentSolution = front.get(k);
-                    int isTabu = validateTabuConstraint(solution, currentSolution, i-1);
+                    int isTabu = validateTabuConstraint(solution, currentSolution, i);
 
                     if (isTabu == 1) {
                         //é Tabu

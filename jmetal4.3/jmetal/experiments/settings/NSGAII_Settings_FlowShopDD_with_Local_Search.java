@@ -21,30 +21,28 @@
 
 package jmetal.experiments.settings;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
-import jmetal.metaheuristics.nsgaII.*;
+import jmetal.core.Algorithm;
+import jmetal.experiments.Settings;
+import jmetal.metaheuristics.nsgaII.NSGAIIwLS;
 import jmetal.operators.crossover.Crossover;
 import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.localSearch.LocalSearch;
-import jmetal.operators.localSearch.MutationLocalSearch;
 import jmetal.operators.localSearch.TabuLocalSearch;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.mutation.MutationFactory;
 import jmetal.operators.selection.Selection;
 import jmetal.operators.selection.SelectionFactory;
 import jmetal.problems.ProblemFactory;
-import jmetal.core.*;
-import jmetal.experiments.Settings;
 import jmetal.problems.flowshop.FlowshopDD;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.JMException;
 
+import java.util.HashMap;
+
 /**
  * Settings class of algorithm NSGA-II (real encoding)
  */
-public class NSGAII_Settings_FlowShopDD extends Settings {
+public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
     public int populationSize_                 ;
     public int maxEvaluations_                 ;
     public double mutationProbability_         ;
@@ -58,7 +56,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
      * Constructor
      * @throws JMException
      */
-    public NSGAII_Settings_FlowShopDD(String problem) throws JMException {
+    public NSGAII_Settings_FlowShopDD_with_Local_Search(String problem) throws JMException {
         super(problem) ;
         //alterado de real para permutation, inclusão do caminho
         //Object [] problemParams = {"Real"};
@@ -74,9 +72,6 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
         // Default settings
         populationSize_              = 100   ;
         maxEvaluations_              = ((FlowshopDD)problem_).getNumberOfJobs_() * populationSize_ * 1000 ;
-        //N * 1000 * NP
-        //N = jobs 20
-        //NP = tamanho da população
         mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
         crossoverProbability_        = 0.9   ;
         mutationDistributionIndex_   = 20.0  ;
@@ -88,7 +83,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
     /**
      * Configure NSGAII with user-defined parameter settings
      * @return A NSGAII algorithm object
-     * @throws jmetal.util.JMException
+     * @throws JMException
      */
     public Algorithm configure() throws JMException {
         Algorithm algorithm ;
@@ -103,9 +98,11 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
 
         // Creating the algorithm. There are two choices: NSGAII and its steady-
         // state variant ssNSGAII
-        algorithm = new NSGAII(problem_) ;//Volmir comentou aqui HIHIIII
-        //algorithm = new NSGAIIwLS(problem_) ;
+        //algorithm = new NSGAII(problem_) ;//Volmir comentou aqui
+        algorithm = new NSGAIIwLS(problem_) ;
         //algorithm = new ssNSGAII(problem_) ;
+
+
 
         // Algorithm parameters
         algorithm.setInputParameter("populationSize",populationSize_);
@@ -123,9 +120,9 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
         mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
 
 
-        /*
-        // Tentativa de colocar a busca local ja implementada XD
         algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
+
+        // Tentativa de colocar a busca local ja implementada XD
         parameters = new HashMap() ;
         parameters.put("problem",problem_);
         parameters.put("improvementRounds",200);
@@ -135,7 +132,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
         parameters.put("prohibitionRule",prohibitionRule);
         //localSearch = new MutationLocalSearch(parameters);
         localSearch = new TabuLocalSearch(parameters);
-*/
+
         // Selection Operator
         parameters = null ;
         selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;
@@ -144,7 +141,7 @@ public class NSGAII_Settings_FlowShopDD extends Settings {
         algorithm.addOperator("crossover",crossover);
         algorithm.addOperator("mutation",mutation);
         algorithm.addOperator("selection",selection);
-        //algorithm.addOperator("localSearch",localSearch);
+        algorithm.addOperator("localSearch",localSearch);
     
     /* Deleted since jMetal 4.2
    // Creating the indicator object

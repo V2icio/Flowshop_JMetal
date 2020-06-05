@@ -3,6 +3,7 @@ package jmetal.problems.flowshop;
 
 import java.io.IOException;
 import java.util.Arrays;
+
 import jmetal.core.Problem;
 import jmetal.core.Solution;
 import jmetal.encodings.solutionType.PermutationSolutionType;
@@ -10,7 +11,6 @@ import jmetal.encodings.variable.Permutation;
 import jmetal.util.JMException;
 import org.la4j.Matrix;
 import org.la4j.matrix.dense.Basic2DMatrix;
-
 
 
 /**
@@ -65,63 +65,49 @@ public class FlowshopDD extends Problem {
             System.out.print(" " + dueDates[jj]);
         }
       System.out.println();*/
-    
-    // Establishes upper and lower limits for the variables
-    for (int var = 0;
-    var< numberOfVariables_ ;
-    var
 
-    
-        ++) {
+        // Establishes upper and lower limits for the variables
+        for (int var = 0; var < numberOfVariables_; var++) {
             lowerLimit_[var] = 0.0;
-        upperLimit_[var] = ri.getNumberOfJobs() - 1;
-    } // for
+            upperLimit_[var] = ri.getNumberOfJobs() - 1;
+        } // for
 
-    // Establishes the length of every encodings.variable
-    length_  = new int[numberOfVariables_];
-    for (int var = 0;
-    var< numberOfVariables_ ;
-    var
-
-    
-        ++) {
+        // Establishes the length of every encodings.variable
+        length_ = new int[numberOfVariables_];
+        for (int var = 0; var < numberOfVariables_; var++) {
             length_[var] = ri.getNumberOfJobs();
+        } // for
 
-    } // for
-
-    if (solutionType.compareTo ("Permutation") == 0) {
+        if (solutionType.compareTo("Permutation") == 0) {
             solutionType_ = new PermutationSolutionType(this);
-    }
-
-    
-        else {
+        } else {
             try {
-            throw new JMException("SolutionType must be Permutation");
-        } catch (JMException e) {
-            e.printStackTrace();
+                throw new JMException("SolutionType must be Permutation");
+            } catch (JMException e) {
+                e.printStackTrace();
+            }
         }
-    }
-} // Flowshop
+    } // Flowshop
 
-public int getNumberOfJobs_() {
+    public int getNumberOfJobs_() {
         return numberOfJobs_;
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void evaluate(Solution solution) throws JMException {
         int[] permutation = ((Permutation) solution.getDecisionVariables()[0]).vector_;
         int[] time = new int[numberOfMachines_];
-        int[] tardiness = new int [numberOfJobs_];
-        int[] earliness = new int [numberOfJobs_];
+        int[] tardiness = new int[numberOfJobs_];
+        int[] earliness = new int[numberOfJobs_];
         int makespan, flowtime, job, prevMachine, p, totalTardiness, totalEarliness;
         totalTardiness = 0;
         totalEarliness = 0;
         for (int i = 0; i < numberOfMachines_; i++) {
             time[i] = 0;                                                           //inicializa tempos 0.
         }
-        
+
         for (int ii = 0; ii < numberOfJobs_; ii++) {
-            tardiness[ii] = 0;  
+            tardiness[ii] = 0;
             earliness[ii] = 0;  //inicializa tempos 0.
         }
 
@@ -133,36 +119,36 @@ public int getNumberOfJobs_() {
         }
 
         flowtime = time[numberOfMachines_ - 1];                                       // inicializa a cont do tempo de um job.
-        int [] completion = new int [numberOfJobs_];
+        int[] completion = new int[numberOfJobs_];
         for (int k = 1; k < numberOfJobs_; k++) {
             job = permutation[k];                                                   //job recebe uma perm
             time[0] += dados[0][job];                                               //primeira maq. so adc.
-            prevMachine = time[0];   
+            prevMachine = time[0];
             //completion[job]=dados[0][job];
             //prevMachine = tempo do job na máquina anterior
             //time[m] tempo decorrido na máquina atual
             for (int m = 1; m < numberOfMachines_; m++) {
                 time[m] = Math.max(prevMachine, time[m]) + dados[m][job];            //Cmax                
                 prevMachine = time[m];
-            }      
-            
-            
-            completion[job] = prevMachine; 
+            }
+
+
+            completion[job] = prevMachine;
             flowtime += time[numberOfMachines_ - 1];                                  //flow time total.   
-            
-            
-            tardiness[job] = Math.max(0,(completion[job]- dueDates[job])); 
+
+
+            tardiness[job] = Math.max(0, (completion[job] - dueDates[job]));
             //System.out.println("Tardiness = "+tardiness[job]);
-            totalTardiness+=tardiness[job];
-            
-           earliness[job] = Math.max(0,(dueDates[job]) - completion[job]); ///ver como agregar o earliness
-           totalEarliness+=earliness[job];
+            totalTardiness += tardiness[job];
+
+            earliness[job] = Math.max(0, (dueDates[job]) - completion[job]); ///ver como agregar o earliness
+            totalEarliness += earliness[job];
             //System.out.println("Earliness = "+earliness[ti]);
             //if(tardiness[ti] > maxTardiness)
             //    maxTardiness = tardiness[ti];
         }
         makespan = time[numberOfMachines_ - 1];
-        
+
         //System.out.println(makespan);
         //System.out.println(flowtime);
         //System.out.println(totalTardiness);

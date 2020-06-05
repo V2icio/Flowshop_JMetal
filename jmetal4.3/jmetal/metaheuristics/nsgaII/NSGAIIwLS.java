@@ -115,6 +115,7 @@ public class NSGAIIwLS extends Algorithm {
 			population.add(newSolution);
 		} //for       
 
+		int roundsWithoutImprovement = 0;
 		// Generations 
 		while (evaluations < maxEvaluations) {
             // Create the offSpring solutionSet
@@ -123,7 +124,7 @@ public class NSGAIIwLS extends Algorithm {
 
 
 		    generations++;
-		    if(generations % localSearchFrequency == 0 && localSearchOperator != null){
+		    if(localSearchOperator != null && generations % localSearchFrequency == 0){
                 Solution bestSolution = population.get(0);
 
                 double obj1[] = new double[2];
@@ -144,7 +145,16 @@ public class NSGAIIwLS extends Algorithm {
 
                 double improvement1 = obj1[0] - obj1[1];
                 double improvement2 = obj2[0] - obj2[1];
-                System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+                if(improvement1 > 0 || improvement2 > 0){
+                	if(roundsWithoutImprovement>0){
+						System.out.println("roundsWithoutImprovement: " + roundsWithoutImprovement);
+					}
+					System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+					roundsWithoutImprovement = 0;
+				} else {
+					roundsWithoutImprovement++;
+				}
+
 
                 population.replace(0, bestSolution);
             }
