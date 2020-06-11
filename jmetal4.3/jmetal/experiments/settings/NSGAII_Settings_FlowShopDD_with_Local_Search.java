@@ -27,6 +27,7 @@ import jmetal.metaheuristics.nsgaII.NSGAIIwLS;
 import jmetal.operators.crossover.Crossover;
 import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.localSearch.LocalSearch;
+import jmetal.operators.localSearch.MutationLocalSearch;
 import jmetal.operators.localSearch.TabuLocalSearch;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.mutation.MutationFactory;
@@ -49,8 +50,8 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
     public double crossoverProbability_        ;
     public double mutationDistributionIndex_   ;
     public double crossoverDistributionIndex_  ;
-    public int localSearchFrequency_  ;
-    public int prohibitionRule  ;
+    public int[] localSearchFrequency_ = new int[1];
+    public HashMap publicParameters;
 
     /**
      * Constructor
@@ -76,7 +77,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         crossoverProbability_        = 0.9   ;
         mutationDistributionIndex_   = 20.0  ;
         crossoverDistributionIndex_  = 20.0  ;
-        localSearchFrequency_ = 30;
+        localSearchFrequency_[0] = 30;
     } // NSGAII_Settings
 
 
@@ -91,6 +92,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         Crossover  crossover ;
         Mutation   mutation  ;
         LocalSearch localSearch;
+        LocalSearch localSearch2;
 
         HashMap  parameters ; // Operator parameters
 
@@ -120,18 +122,62 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
 
 
-        algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
 
-        // Tentativa de colocar a busca local ja implementada XD
+        System.out.println("Tabu Local Search:");
+
+        int[] localSearchFrequency = (int[]) publicParameters.get("localSearchFrequency");
+        if(localSearchFrequency == null){
+            algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
+            System.out.println("localSearchFrequency: " + localSearchFrequency_);
+
+        } else {
+            algorithm.setInputParameter("localSearchFrequency",localSearchFrequency);
+            System.out.print("localSearchFrequency:  ");
+            for(int i = 0; i<localSearchFrequency.length; i++){
+                System.out.print(localSearchFrequency[i] + " ");
+            }
+        }
+
+        int[] proibitionRules = (int[]) publicParameters.get("proibitionRules");
+
+        if(proibitionRules == null || proibitionRules.length == 0 || proibitionRules.length > 2){
+            System.out.println("Erro nas regras de proibição. proibitionRules.length = " + proibitionRules.length);
+            System.exit(0);
+        } else {
+            System.out.print("proibitionRules:  ");
+            for (int i=0; i<proibitionRules.length; i++) {
+                System.out.print(i +":"+ proibitionRules[i] + "  ");
+            }
+            System.out.println();
+        }
+
+
         parameters = new HashMap() ;
         parameters.put("problem",problem_);
         parameters.put("improvementRounds",200);
         parameters.put("numberOfNeighbors",20);
         parameters.put("tabuLenghtTime",10);
         parameters.put("mutation",mutation);
-        parameters.put("prohibitionRule",prohibitionRule);
+        parameters.put("prohibitionRule",(Integer)proibitionRules[0]);
         //localSearch = new MutationLocalSearch(parameters);
         localSearch = new TabuLocalSearch(parameters);
+
+
+        if(proibitionRules.length == 2){
+            parameters = new HashMap() ;
+            parameters.put("problem",problem_);
+            parameters.put("improvementRounds",200);
+            parameters.put("numberOfNeighbors",20);
+            parameters.put("tabuLenghtTime",10);
+            parameters.put("mutation",mutation);
+            parameters.put("prohibitionRule",(Integer)proibitionRules[1]);
+            localSearch2 = new TabuLocalSearch(parameters);
+            algorithm.addOperator("localSearch2",localSearch2);
+
+            System.out.println("ADICIONADO OPERADOR 2 DE LS");
+        }
+        //localSearch = new MutationLocalSearch(parameters);
+
 
         // Selection Operator
         parameters = null ;
@@ -142,7 +188,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         algorithm.addOperator("mutation",mutation);
         algorithm.addOperator("selection",selection);
         algorithm.addOperator("localSearch",localSearch);
-    
+
     /* Deleted since jMetal 4.2
    // Creating the indicator object
    if ((paretoFrontFile_!=null) && (!paretoFrontFile_.equals(""))) {

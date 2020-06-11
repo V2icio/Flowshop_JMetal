@@ -235,10 +235,13 @@ public abstract class Experiment {
 					if(!f.exists()){
 						paretoFrontFile_[i] = "";
 						generateReferenceFronts(i);
+
 					}else{
 						frontPath_[i] = paretoFrontDirectory_ + "/" + paretoFrontFile_[i];
 					} // if
 				} // if
+				//coloquei isso aqui no desespero
+				//frontPath_[i] = paretoFrontDirectory_ + "/" + paretoFrontFile_[i];
 			} // for
 		} // if
 	} // checkParetoFronts
@@ -380,6 +383,17 @@ public abstract class Experiment {
 			boolean result = new File(referenceFrontDirectory).mkdirs();			
 			System.out.println("Creating " + referenceFrontDirectory);
 		}
+
+
+		//
+		//TODO: Coloquei o if abaixo. TIRAR
+		//
+		if(frontPath_ == null){
+			frontPath_ = new String[problemList_.length];
+			map_.put("frontPath",frontPath_);
+		}
+
+
 
 		frontPath_[problemIndex] = referenceFrontDirectory + "/" + problemList_[problemIndex] + ".rf";
 

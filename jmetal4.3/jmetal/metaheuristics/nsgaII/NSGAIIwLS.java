@@ -34,7 +34,7 @@ import jmetal.util.comparators.DominanceComparator;
 import java.util.Comparator;
 import java.util.HashMap;
 
-/** 
+/**
  *  Implementation of NSGA-II.
  *  This implementation of NSGA-II makes use of a QualityIndicator object
  *  to obtained the convergence speed of the algorithm. This version is used
@@ -54,11 +54,11 @@ public class NSGAIIwLS extends Algorithm {
 		super (problem) ;
 	} // NSGAII
 
-	/**   
+	/**
 	 * Runs the NSGA-II algorithm.
 	 * @return a <code>SolutionSet</code> that is a set of non dominated solutions
 	 * as a result of the algorithm execution
-	 * @throws JMException 
+	 * @throws JMException
 	 */
 	public SolutionSet execute() throws JMException, ClassNotFoundException {
 		int populationSize;
@@ -77,9 +77,11 @@ public class NSGAIIwLS extends Algorithm {
 		Operator crossoverOperator;
 		Operator selectionOperator;
 		LocalSearch localSearchOperator;
+		LocalSearch localSearchOperator2;
 
-		int localSearchFrequency; //Frequency of application of local search
-        int generations;
+		int[] localSearchFrequency; //Frequency of application of local search
+		int generations;
+		int actualLocalSearchFrequency;
 
 		Distance distance = new Distance();
 
@@ -87,7 +89,21 @@ public class NSGAIIwLS extends Algorithm {
 		populationSize = ((Integer) getInputParameter("populationSize")).intValue();
 		maxEvaluations = ((Integer) getInputParameter("maxEvaluations")).intValue();
 		indicators = (QualityIndicator) getInputParameter("indicators");
-		localSearchFrequency = ((Integer) getInputParameter("localSearchFrequency")).intValue();
+		localSearchFrequency = ((int[]) getInputParameter("localSearchFrequency"));
+
+		if(localSearchFrequency == null || localSearchFrequency.length == 0)
+		{
+			System.out.println("Problema com o valor de frequencia de busca local.");
+			System.exit(0);
+		}
+
+		System.out.print("localSearchFrequency: ");
+		for(int i = 0; i<localSearchFrequency.length; i++){
+			System.out.print(localSearchFrequency[i] + " ");
+		}
+		System.out.println();
+
+		actualLocalSearchFrequency = localSearchFrequency[0];
 
 
 		//Initialize the variables
@@ -102,6 +118,7 @@ public class NSGAIIwLS extends Algorithm {
 		crossoverOperator = operators_.get("crossover");
 		selectionOperator = operators_.get("selection");
 		localSearchOperator = (LocalSearch) operators_.get("localSearch");
+		localSearchOperator2 = (LocalSearch) operators_.get("localSearch2");
 
 
 
@@ -118,46 +135,78 @@ public class NSGAIIwLS extends Algorithm {
 		int roundsWithoutImprovement = 0;
 		// Generations 
 		while (evaluations < maxEvaluations) {
-            // Create the offSpring solutionSet
-            offspringPopulation = new SolutionSet(populationSize);
-            Solution[] parents = new Solution[2];
+			// Create the offSpring solutionSet
+			offspringPopulation = new SolutionSet(populationSize);
+			Solution[] parents = new Solution[2];
+
+			generations++;
+
+			//Atualizar o actualLocalSearchFrequency
+			if(localSearchFrequency.length > 1 && actualLocalSearchFrequency != localSearchFrequency[1] && evaluations >= maxEvaluations/2){
+				actualLocalSearchFrequency = localSearchFrequency[1];
+			}
+
+			//(tamPop/5) - numObjetivos -> Numero de soluções que serão escolhidas para aplicação da TS
 
 
-		    generations++;
-		    if(localSearchOperator != null && generations % localSearchFrequency == 0){
-                Solution bestSolution = population.get(0);
 
-                double obj1[] = new double[2];
-                double obj2[] = new double[2];
+			if(localSearchOperator != null && generations % actualLocalSearchFrequency == 0){
+                int numberApplicationsTabuSearch = (populationSize/5) - problem_.getNumberOfObjectives();
 
-                obj1[0] = (double) bestSolution.getObjective(0);
-                obj2[0] = (double) bestSolution.getObjective(1);
+			    Ranking firstRanking = new Ranking(population);
 
-                bestSolution = (Solution) localSearchOperator.execute(bestSolution);
+				SolutionSet aplicationSet = firstRanking.getSubfront(0);
 
-                evaluations += localSearchOperator.getEvaluations();
+				while(aplicationSet.size() < numberApplicationsTabuSearch){
 
-                problem_.evaluate(bestSolution);
-                problem_.evaluateConstraints(bestSolution);
+                }
 
-                obj1[1] = (double) bestSolution.getObjective(0);
-                obj2[1] = (double) bestSolution.getObjective(1);
 
-                double improvement1 = obj1[0] - obj1[1];
-                double improvement2 = obj2[0] - obj2[1];
-                if(improvement1 > 0 || improvement2 > 0){
-                	if(roundsWithoutImprovement>0){
-						System.out.println("roundsWithoutImprovement: " + roundsWithoutImprovement);
+				SolutionSet firstFront = firstRanking.getSubfront(0);
+
+
+				for(int i=0; i<numberApplicationsTabuSearch; i++){
+
+
+
+					//Chose a random solution from the first front
+					int chosenSolutionPosition = PseudoRandom.randInt(0, firstFront.size() - 1);
+					Solution bestSolution = population.get(chosenSolutionPosition);
+
+					double obj1[] = new double[2];
+					double obj2[] = new double[2];
+
+					obj1[0] = (double) bestSolution.getObjective(0);
+					obj2[0] = (double) bestSolution.getObjective(1);
+
+					if(evaluations < maxEvaluations/2 || localSearchOperator2 == null){
+						bestSolution = (Solution) localSearchOperator.execute(bestSolution);
+						evaluations += localSearchOperator.getEvaluations();
+					} else {
+						bestSolution = (Solution) localSearchOperator2.execute(bestSolution);
+						evaluations += localSearchOperator2.getEvaluations();
 					}
-					System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
-					roundsWithoutImprovement = 0;
-				} else {
-					roundsWithoutImprovement++;
+
+					problem_.evaluate(bestSolution);
+					problem_.evaluateConstraints(bestSolution);
+
+					obj1[1] = (double) bestSolution.getObjective(0);
+					obj2[1] = (double) bestSolution.getObjective(1);
+
+					double improvement1 = obj1[0] - obj1[1];
+					double improvement2 = obj2[0] - obj2[1];
+					if(improvement1 > 0 || improvement2 > 0){
+						if(roundsWithoutImprovement>0){
+							System.out.println("roundsWithoutImprovement: " + roundsWithoutImprovement);
+						}
+						System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+						roundsWithoutImprovement = 0;
+					} else {
+						roundsWithoutImprovement++;
+					}
+					population.replace(chosenSolutionPosition, bestSolution);
 				}
-
-
-                population.replace(0, bestSolution);
-            }
+			}
 
 
 			for (int i = 0; i < (populationSize / 2); i++) {
