@@ -34,6 +34,8 @@ import jmetal.util.comparators.DominanceComparator;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import jmetal.encodings.variable.Permutation;
+
 /**
  *  Implementation of NSGA-II.
  *  This implementation of NSGA-II makes use of a QualityIndicator object
@@ -97,14 +99,7 @@ public class NSGAIIwLS extends Algorithm {
 			System.exit(0);
 		}
 
-		System.out.print("localSearchFrequency: ");
-		for(int i = 0; i<localSearchFrequency.length; i++){
-			System.out.print(localSearchFrequency[i] + " ");
-		}
-		System.out.println();
-
 		actualLocalSearchFrequency = localSearchFrequency[0];
-
 
 		//Initialize the variables
 		population = new SolutionSet(populationSize);
@@ -148,30 +143,39 @@ public class NSGAIIwLS extends Algorithm {
 
 			//(tamPop/5) - numObjetivos -> Numero de soluções que serão escolhidas para aplicação da TS
 
-
-
 			if(localSearchOperator != null && generations % actualLocalSearchFrequency == 0){
                 int numberApplicationsTabuSearch = (populationSize/5) - problem_.getNumberOfObjectives();
 
 			    Ranking firstRanking = new Ranking(population);
+                int[] solutionsToApply = new int[numberApplicationsTabuSearch];
 
-				SolutionSet aplicationSet = firstRanking.getSubfront(0);
+                int numberSolutionsToBeChosen = numberApplicationsTabuSearch;
 
-				while(aplicationSet.size() < numberApplicationsTabuSearch){
+				//SolutionSet aplicationSet = firstRanking.getSubfront(0);
 
+                int actualFront = 0;
+				while(numberSolutionsToBeChosen > 0){
+				    if(numberSolutionsToBeChosen > firstRanking.getSubfront(actualFront).size()){
+				        for(int i=0; i<firstRanking.getSubfront(actualFront).size(); i++){
+                            solutionsToApply[numberApplicationsTabuSearch - numberSolutionsToBeChosen] = numberApplicationsTabuSearch-numberSolutionsToBeChosen;
+                            numberSolutionsToBeChosen--;
+                        }
+                        actualFront++;
+                    } else {
+				        Permutation randomPermutationSolutions = new Permutation(firstRanking.getSubfront(actualFront).size());
+				        for(int i=0; i<numberSolutionsToBeChosen; i++){
+				            solutionsToApply[numberApplicationsTabuSearch - numberSolutionsToBeChosen + i] = randomPermutationSolutions.vector_[i];
+                        }
+                        numberSolutionsToBeChosen = 0;
+                    }
                 }
-
-
-				SolutionSet firstFront = firstRanking.getSubfront(0);
-
+				//SolutionSet firstFront = firstRanking.getSubfront(0);
 
 				for(int i=0; i<numberApplicationsTabuSearch; i++){
-
-
-
 					//Chose a random solution from the first front
-					int chosenSolutionPosition = PseudoRandom.randInt(0, firstFront.size() - 1);
-					Solution bestSolution = population.get(chosenSolutionPosition);
+					//int chosenSolutionPosition = PseudoRandom.randInt(0, firstFront.size() - 1);
+					//Solution bestSolution = population.get(chosenSolutionPosition);
+                    Solution bestSolution = population.get(solutionsToApply[i]);
 
 					double obj1[] = new double[2];
 					double obj2[] = new double[2];
@@ -199,12 +203,12 @@ public class NSGAIIwLS extends Algorithm {
 						if(roundsWithoutImprovement>0){
 							System.out.println("roundsWithoutImprovement: " + roundsWithoutImprovement);
 						}
-						System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+						//System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
 						roundsWithoutImprovement = 0;
 					} else {
 						roundsWithoutImprovement++;
 					}
-					population.replace(chosenSolutionPosition, bestSolution);
+					population.replace(solutionsToApply[i], bestSolution);
 				}
 			}
 

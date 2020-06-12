@@ -92,14 +92,12 @@ public class StandardStudy_FlowShopDD extends Experiment {
             /*-------------------------------------*/
             //Alg 1
             pulicParameters = new HashMap();
-            localSearchFrequency = new int[2];
+            localSearchFrequency = new int[1];
             localSearchFrequency[0] = 100;
-            localSearchFrequency[1] = 30;
             pulicParameters.put("localSearchFrequency", localSearchFrequency);
 
-            proibitionRules = new int[2];
+            proibitionRules = new int[1];
             proibitionRules[0] = 2;
-            proibitionRules[1] = 7;
             pulicParameters.put("proibitionRules", proibitionRules);
 
             aux = new NSGAII_Settings_FlowShopDD_with_Local_Search(problemName);
@@ -110,24 +108,22 @@ public class StandardStudy_FlowShopDD extends Experiment {
             //Alg 2
             pulicParameters = new HashMap();
             localSearchFrequency = new int[1];
-            localSearchFrequency[0] = 100;
+            localSearchFrequency[0] = 30;
             pulicParameters.put("localSearchFrequency", localSearchFrequency);
 
-            proibitionRules = new int[2];
+            proibitionRules = new int[1];
             proibitionRules[0] = 2;
-            proibitionRules[1] = 7;
             pulicParameters.put("proibitionRules", proibitionRules);
 
             aux = new NSGAII_Settings_FlowShopDD_with_Local_Search(problemName);
             ((NSGAII_Settings_FlowShopDD_with_Local_Search) aux).publicParameters = pulicParameters;
             algorithm[1] = aux.configure(parameters[1]);
             //-------------------------------------
-            /*
+
             //Alg 3
             pulicParameters = new HashMap();
-            localSearchFrequency = new int[2];
+            localSearchFrequency = new int[1];
             localSearchFrequency[0] = 100;
-            localSearchFrequency[1] = 30;
             pulicParameters.put("localSearchFrequency", localSearchFrequency);
 
             proibitionRules = new int[1];
@@ -141,7 +137,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
             //Alg 4
             pulicParameters = new HashMap();
             localSearchFrequency = new int[1];
-            localSearchFrequency[0] = 100;
+            localSearchFrequency[0] = 30;
             pulicParameters.put("localSearchFrequency", localSearchFrequency);
 
             proibitionRules = new int[1];
@@ -152,6 +148,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
             ((NSGAII_Settings_FlowShopDD_with_Local_Search) aux).publicParameters = pulicParameters;
             algorithm[3] = aux.configure(parameters[3]);
             //-------------------------------------
+             /*
             //Alg 5
             pulicParameters = new HashMap();
             localSearchFrequency = new int[1];
@@ -202,7 +199,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
         StandardStudy_FlowShopDD exp = new StandardStudy_FlowShopDD();
 
         exp.experimentName_ = "StandardStudy";  //usado ns tabelas do latex evitar "_"
-        exp.algorithmNameList_ = new String[]{"teste, teste2"};
+        exp.algorithmNameList_ = new String[]{"ex3-rul2-freq100","ex3-rul2-freq30","ex3-rul7-freq100","ex3-rul7-freq30"};
         //nome dos algoritmos a serem executados, vão ser criadas pastas e colunas das tabelas com estes nomes
         //"NSGAII", "SPEA2", "MOCell", "SMPSO", "GDE3"};
         //"NSGAIIRul7","NSGAIIRul2","NSGAIIrules7_2", "NSGAIIrules2_7"

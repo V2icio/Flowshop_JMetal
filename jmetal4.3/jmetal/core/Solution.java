@@ -118,6 +118,8 @@ public class Solution implements Serializable {
 
   public void setSwapMovement(int[] swapMovement) {
     this.swapMovement = swapMovement;
+
+
   }
 
   /**
