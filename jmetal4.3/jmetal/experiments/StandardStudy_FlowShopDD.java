@@ -202,7 +202,7 @@ public class StandardStudy_FlowShopDD extends Experiment {
         StandardStudy_FlowShopDD exp = new StandardStudy_FlowShopDD();
 
         exp.experimentName_ = "StandardStudy";  //usado ns tabelas do latex evitar "_"
-        exp.algorithmNameList_ = new String[]{"teste, teste2"};
+        exp.algorithmNameList_ = new String[]{"teste", "teste2"};
         //nome dos algoritmos a serem executados, vão ser criadas pastas e colunas das tabelas com estes nomes
         //"NSGAII", "SPEA2", "MOCell", "SMPSO", "GDE3"};
         //"NSGAIIRul7","NSGAIIRul2","NSGAIIrules7_2", "NSGAIIrules2_7"

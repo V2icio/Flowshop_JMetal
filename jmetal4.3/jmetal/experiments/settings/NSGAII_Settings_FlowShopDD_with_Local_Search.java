@@ -72,7 +72,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         }
         // Default settings
         populationSize_              = 100   ;
-        maxEvaluations_              = ((FlowshopDD)problem_).getNumberOfJobs_() * populationSize_ * 1000 ;
+        maxEvaluations_              = 5000;//((FlowshopDD)problem_).getNumberOfJobs_() * populationSize_ * 1000 ;
         mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
         crossoverProbability_        = 0.9   ;
         mutationDistributionIndex_   = 20.0  ;
