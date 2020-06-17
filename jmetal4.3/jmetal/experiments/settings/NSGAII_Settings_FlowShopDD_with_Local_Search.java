@@ -122,20 +122,12 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         mutation = MutationFactory.getMutationOperator("SwapMutation", parameters);
 
 
-
-        System.out.println("Tabu Local Search:");
-
         int[] localSearchFrequency = (int[]) publicParameters.get("localSearchFrequency");
         if(localSearchFrequency == null){
             algorithm.setInputParameter("localSearchFrequency",localSearchFrequency_);
-            System.out.println("localSearchFrequency: " + localSearchFrequency_);
 
         } else {
             algorithm.setInputParameter("localSearchFrequency",localSearchFrequency);
-            System.out.print("localSearchFrequency:  ");
-            for(int i = 0; i<localSearchFrequency.length; i++){
-                System.out.print(localSearchFrequency[i] + " ");
-            }
         }
 
         int[] proibitionRules = (int[]) publicParameters.get("proibitionRules");
@@ -143,12 +135,6 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         if(proibitionRules == null || proibitionRules.length == 0 || proibitionRules.length > 2){
             System.out.println("Erro nas regras de proibição. proibitionRules.length = " + proibitionRules.length);
             System.exit(0);
-        } else {
-            System.out.print("proibitionRules:  ");
-            for (int i=0; i<proibitionRules.length; i++) {
-                System.out.print(i +":"+ proibitionRules[i] + "  ");
-            }
-            System.out.println();
         }
 
 
@@ -173,8 +159,6 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
             parameters.put("prohibitionRule",(Integer)proibitionRules[1]);
             localSearch2 = new TabuLocalSearch(parameters);
             algorithm.addOperator("localSearch2",localSearch2);
-
-            System.out.println("ADICIONADO OPERADOR 2 DE LS");
         }
         //localSearch = new MutationLocalSearch(parameters);
 

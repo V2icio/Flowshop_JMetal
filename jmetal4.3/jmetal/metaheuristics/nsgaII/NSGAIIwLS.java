@@ -97,14 +97,7 @@ public class NSGAIIwLS extends Algorithm {
 			System.exit(0);
 		}
 
-		System.out.print("localSearchFrequency: ");
-		for(int i = 0; i<localSearchFrequency.length; i++){
-			System.out.print(localSearchFrequency[i] + " ");
-		}
-		System.out.println();
-
 		actualLocalSearchFrequency = localSearchFrequency[0];
-
 
 		//Initialize the variables
 		population = new SolutionSet(populationSize);
@@ -119,8 +112,6 @@ public class NSGAIIwLS extends Algorithm {
 		selectionOperator = operators_.get("selection");
 		localSearchOperator = (LocalSearch) operators_.get("localSearch");
 		localSearchOperator2 = (LocalSearch) operators_.get("localSearch2");
-
-
 
 		// Create the initial solutionSet
 		Solution newSolution;
@@ -182,7 +173,7 @@ public class NSGAIIwLS extends Algorithm {
 					if(roundsWithoutImprovement>0){
 						System.out.println("roundsWithoutImprovement: " + roundsWithoutImprovement);
 					}
-					System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
+					//System.out.println("Improvement LS = makespan: " + improvement1 + " TFT: " + improvement2);
 					roundsWithoutImprovement = 0;
 				} else {
 					roundsWithoutImprovement++;
