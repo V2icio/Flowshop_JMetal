@@ -72,7 +72,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         }
         // Default settings
         populationSize_              = 100   ;
-        maxEvaluations_              = 5000;//((FlowshopDD)problem_).getNumberOfJobs_() * populationSize_ * 1000 ;
+        maxEvaluations_              = ((FlowshopDD)problem_).getNumberOfJobs_() * populationSize_ * 1000 ;
         mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
         crossoverProbability_        = 0.9   ;
         mutationDistributionIndex_   = 20.0  ;
@@ -140,8 +140,8 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
 
         parameters = new HashMap() ;
         parameters.put("problem",problem_);
-        parameters.put("improvementRounds",200);
-        parameters.put("numberOfNeighbors",20);
+        parameters.put("improvementRounds",20);
+        parameters.put("numberOfNeighbors",100);
         parameters.put("tabuLenghtTime",10);
         parameters.put("mutation",mutation);
         parameters.put("prohibitionRule",(Integer)proibitionRules[0]);
@@ -152,8 +152,8 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         if(proibitionRules.length == 2){
             parameters = new HashMap() ;
             parameters.put("problem",problem_);
-            parameters.put("improvementRounds",200);
-            parameters.put("numberOfNeighbors",20);
+            parameters.put("improvementRounds",20);
+            parameters.put("numberOfNeighbors",100);
             parameters.put("tabuLenghtTime",10);
             parameters.put("mutation",mutation);
             parameters.put("prohibitionRule",(Integer)proibitionRules[1]);
