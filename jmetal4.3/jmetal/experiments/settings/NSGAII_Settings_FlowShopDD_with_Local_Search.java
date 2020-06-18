@@ -141,7 +141,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
         parameters = new HashMap() ;
         parameters.put("problem",problem_);
         parameters.put("improvementRounds",20);
-        parameters.put("numberOfNeighbors",100);
+        parameters.put("numberOfNeighbors",200);
         parameters.put("tabuLenghtTime",10);
         parameters.put("mutation",mutation);
         parameters.put("prohibitionRule",(Integer)proibitionRules[0]);
@@ -153,7 +153,7 @@ public class NSGAII_Settings_FlowShopDD_with_Local_Search extends Settings {
             parameters = new HashMap() ;
             parameters.put("problem",problem_);
             parameters.put("improvementRounds",20);
-            parameters.put("numberOfNeighbors",100);
+            parameters.put("numberOfNeighbors",200);
             parameters.put("tabuLenghtTime",10);
             parameters.put("mutation",mutation);
             parameters.put("prohibitionRule",(Integer)proibitionRules[1]);
